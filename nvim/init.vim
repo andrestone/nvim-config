@@ -42,8 +42,8 @@ Plug 'gruvbox-community/gruvbox'
 Plug 'nathanaelkane/vim-indent-guides'
 Plug 'vim-airline/vim-airline'
 Plug 'tpope/vim-markdown'
-Plug 'flazz/vim-colorschemes'
-
+Plug 'rafi/awesome-vim-colorschemes'
+Plug 'dracula/vim', { 'as': 'dracula' }
 call plug#end()
 
 " Load lua configs
