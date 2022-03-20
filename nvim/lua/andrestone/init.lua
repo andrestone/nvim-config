@@ -81,9 +81,14 @@ local eslint = {
 local default_prettier_max_line = "100"
 
 local prettier = {
-	formatCommand = "prettier --fix-tostdout --semi --single-quote --print-width "
+	formatCommand = "prettier --fix-tostdout --semi --single-quote --prose-wrap always --print-width "
 		.. default_prettier_max_line
 		.. " --stdin-filepath ${INPUT}",
+	formatStdin = true,
+}
+
+local black = {
+	formatCommand = "black --quiet -",
 	formatStdin = true,
 }
 
@@ -101,6 +106,7 @@ local formats = {
 	typescript = { prettier, eslint },
 	typescriptreact = { prettier, eslint },
 	yaml = { prettier },
+        python = { black }
 }
 
 require("lspconfig").efm.setup({
@@ -120,7 +126,7 @@ require("lspconfig").clangd.setup({
 	root_dir = function()
 		return vim.loop.cwd()
 	end,
-	cmd = { "clangd-12", "--background-index" },
+	cmd = { "clangd", "--background-index" },
 })
 
 require("lspconfig").jedi_language_server.setup({
