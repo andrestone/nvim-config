@@ -1,7 +1,7 @@
 set termguicolors
 " Pythons and Perls
 let g:python_host_prog = '/home/andre/.pyenv/versions/py2nvim/bin/python2' 
-let g:python3_host_prog = '/home/andre/.pyenv/versions/py3nvim/bin/python3' 
+let g:python3_host_prog = '/Users/andre/.pyenv/versions/py3nvim/bin/python3' 
 let g:loaded_perl_provider = 0
 
 
