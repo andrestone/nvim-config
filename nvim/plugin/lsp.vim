@@ -7,7 +7,7 @@ nnoremap <leader>H :lua vim.lsp.buf.signature_help()<CR>
 nnoremap <F7> :lua vim.lsp.buf.references()<CR>
 nnoremap <leader>rn :lua vim.lsp.buf.rename()<CR>
 nnoremap <leader>h :lua vim.lsp.buf.hover()<CR>
-nnoremap <leader>l :lua vim.lsp.buf.formatting()<CR>
+nnoremap <leader>l :lua vim.lsp.buf.format { async = true }<CR>
 nnoremap <leader>ca :lua vim.lsp.buf.code_action()<CR>
 nnoremap <leader><F2> :lua vim.lsp.diagnostic.show_line_diagnostics(); vim.lsp.util.show_line_diagnostics()<CR>
 nnoremap <F2> :lua vim.diagnostic.goto_next({ float =  { border = "single" }})<CR>
