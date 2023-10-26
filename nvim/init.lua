@@ -15,6 +15,16 @@ require("packer").startup(function(use)
   -- Package manager
   use("wbthomason/packer.nvim")
 
+  use({
+    "j-hui/fidget.nvim",
+    tag = "legacy",
+    config = function()
+      require("fidget").setup({
+        -- options
+      })
+    end,
+  })
+
   use({ -- LSP Configuration & Plugins
     "neovim/nvim-lspconfig",
     requires = {
@@ -67,7 +77,7 @@ require("packer").startup(function(use)
 
   -- Color schemes
   -- Gruvbox
-  use("gruvbox-community/gruvbox")
+  use("morhetz/gruvbox")
   -- Kanagawa
   use("rebelot/kanagawa.nvim")
   -- Nord
@@ -89,7 +99,7 @@ require("packer").startup(function(use)
   })
 
   use("lukas-reineke/indent-blankline.nvim") -- Add indentation guides even on blank lines
-  use("tpope/vim-sleuth") -- Detect tabstop and shiftwidth automatically
+  use("tpope/vim-sleuth")                   -- Detect tabstop and shiftwidth automatically
 
   -- Commenting
   use("tpope/vim-commentary")
@@ -381,6 +391,7 @@ vim.g.markdown_fenced_languages = {
   "python",
   "bash=sh",
   "ts=typescript",
+  "tsx=typescriptreact",
   "typescript",
   "js=javascript",
   "javascript",
@@ -431,7 +442,9 @@ null_ls.setup({
   sources = {
     null_ls.builtins.formatting.stylua,
     null_ls.builtins.completion.spell,
-    null_ls.builtins.formatting.black,
+    null_ls.builtins.formatting.black.with({
+      extra_args = { "--line-length", "120" },
+    }),
     null_ls.builtins.formatting.prettierd.with({
       filetypes = { "json", "css", "scss", "html", "markdown" },
       extra_args = { "--printWidth", "100" },
@@ -447,7 +460,6 @@ vim.keymap.set("n", "<leader>l", function()
       return client.name ~= "tsserver"
     end,
   })
-  vim.cmd([[EslintFixAll]])
 end, { desc = "[F]ormat" })
 
 -- Autopairs
@@ -467,13 +479,19 @@ require("nvim-tree").setup({
       resize_window = false,
     },
   },
-  view = {
-    mappings = {
-      list = {
-        { key = { "s" }, action = "vsplit" },
-      },
-    },
-  },
+  on_attach = function(bufnr)
+    local api = require("nvim-tree.api")
+
+    local function opts(desc)
+      return { desc = "nvim-tree: " .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
+    end
+
+    -- default mappings
+    api.config.mappings.default_on_attach(bufnr)
+
+    -- custom mappings
+    vim.keymap.set("n", "s", api.node.open.vertical, opts("Open: Vertical Split"))
+  end,
 })
 
 -- Set lualine as statusline
@@ -531,7 +549,7 @@ pcall(require("telescope").load_extension, "fzf")
 vim.keymap.set("n", "<leader>fo", require("telescope.builtin").oldfiles, { desc = "[F]ind recently [O]pened files" })
 vim.keymap.set("n", "<leader>fb", require("telescope.builtin").buffers, { desc = "[F]ind existing [B]uffers" })
 vim.keymap.set("n", "<leader>f/", function()
-vim.keymap.set("i", "<C-q>", require("telescope.builtin").quickfix, { desc = "Send to [Quick][F]ix" })
+  vim.keymap.set("i", "<C-q>", require("telescope.builtin").quickfix, { desc = "Send to [Quick][F]ix" })
   -- You can pass additional configuration to telescope to change theme, layout, etc.
   require("telescope.builtin").current_buffer_fuzzy_find(require("telescope.themes").get_dropdown({
     winblend = 10,
@@ -704,9 +722,10 @@ local servers = {
   clangd = {},
   gopls = {},
   pyright = {},
+  jsonls = {},
   rust_analyzer = {},
   tsserver = {},
-  sumneko_lua = {
+  lua_ls = {
     Lua = {
       workspace = { checkThirdParty = false },
       telemetry = { enable = false },
