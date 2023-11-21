@@ -25,6 +25,9 @@ require("packer").startup(function(use)
     end,
   })
 
+  -- jupytext
+  use('goerz/jupytext.vim')
+
   use({ -- LSP Configuration & Plugins
     "neovim/nvim-lspconfig",
     requires = {
@@ -99,7 +102,7 @@ require("packer").startup(function(use)
   })
 
   use("lukas-reineke/indent-blankline.nvim") -- Add indentation guides even on blank lines
-  use("tpope/vim-sleuth")                   -- Detect tabstop and shiftwidth automatically
+  use("tpope/vim-sleuth")                    -- Detect tabstop and shiftwidth automatically
 
   -- Commenting
   use("tpope/vim-commentary")
@@ -173,6 +176,9 @@ vim.api.nvim_create_autocmd("BufWritePost", {
 
 -- [[ Setting options ]]
 -- See `:help vim.o`
+
+-- Use percent for jupytext
+vim.g.jupytext_fmt = 'py'
 
 -- Hide buffers don't close them
 vim.o.hidden = true
@@ -510,12 +516,10 @@ require("lualine").setup({
 
 -- Enable `lukas-reineke/indent-blankline.nvim`
 -- See `:help indent_blankline.txt`
-require("indent_blankline").setup({
-  char = "|",
-  show_trailing_blankline_indent = false,
+require("ibl").setup({
+  enabled = false,
 })
-vim.g.indent_blankline_enabled = false
-vim.keymap.set({ "n" }, "<leader>in", ":IndentBlanklineToggle<CR>", { silent = true })
+vim.keymap.set({ "n" }, "<leader>in", ":IBLToggle<CR>", { silent = true })
 
 -- Gitsigns
 -- See `:help gitsigns.txt`
