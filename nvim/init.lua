@@ -26,7 +26,7 @@ require("packer").startup(function(use)
   })
 
   -- jupytext
-  use('goerz/jupytext.vim')
+  use("goerz/jupytext.vim")
 
   use({ -- LSP Configuration & Plugins
     "neovim/nvim-lspconfig",
@@ -45,7 +45,7 @@ require("packer").startup(function(use)
 
   -- Null-ls
   use({
-    "jose-elias-alvarez/null-ls.nvim",
+    "nvimtools/none-ls.nvim",
     requires = {
       "nvim-lua/plenary.nvim",
       "neovim/nvim-lspconfig",
@@ -102,7 +102,7 @@ require("packer").startup(function(use)
   })
 
   use("lukas-reineke/indent-blankline.nvim") -- Add indentation guides even on blank lines
-  use("tpope/vim-sleuth")                    -- Detect tabstop and shiftwidth automatically
+  use("tpope/vim-sleuth")                   -- Detect tabstop and shiftwidth automatically
 
   -- Commenting
   use("tpope/vim-commentary")
@@ -178,7 +178,7 @@ vim.api.nvim_create_autocmd("BufWritePost", {
 -- See `:help vim.o`
 
 -- Use percent for jupytext
-vim.g.jupytext_fmt = 'py'
+vim.g.jupytext_fmt = "py"
 
 -- Hide buffers don't close them
 vim.o.hidden = true
@@ -291,7 +291,6 @@ vim.keymap.set({ "n" }, "<C-v>", '"+p', { silent = true, noremap = true })
 vim.keymap.set({ "n" }, "<C-n>", vim.cmd.NvimTreeToggle, { silent = true })
 vim.keymap.set({ "n" }, "<leader><C-n>", ":NvimTreeFindFile!<CR>", { silent = true })
 vim.keymap.set({ "n" }, "<leader>u", vim.cmd.UndotreeToggle, { silent = true })
-vim.keymap.set({ "n" }, "<leader>l", vim.cmd.Format, { silent = true })
 vim.keymap.set({ "n" }, "<leader>gb", ":Gitsigns toggle_current_line_blame<CR>", { silent = true })
 -- TODO: convert the mappings below to lua friendly
 -- Comments
@@ -445,6 +444,7 @@ end
 -- Null-ls
 local null_ls = require("null-ls")
 null_ls.setup({
+  debug = true,
   sources = {
     null_ls.builtins.formatting.stylua,
     null_ls.builtins.completion.spell,
@@ -453,16 +453,34 @@ null_ls.setup({
     }),
     null_ls.builtins.formatting.prettierd.with({
       filetypes = { "json", "css", "scss", "html", "markdown" },
-      extra_args = { "--printWidth", "100" },
     }),
-    null_ls.builtins.formatting.eslint,
+    null_ls.builtins.formatting.eslint_d.with({
+      cwd = function(params)
+        local ret = require("null-ls.utils").root_pattern(
+        -- https://eslint.org/docs/latest/user-guide/configuring/configuration-files-new
+          "eslint.config.js",
+          -- https://eslint.org/docs/user-guide/configuring/configuration-files#configuration-file-formats
+          ".eslintrc",
+          ".eslintrc.js",
+          ".eslintrc.cjs",
+          ".eslintrc.yaml",
+          ".eslintrc.yml",
+          ".eslintrc.json",
+          "package.json"
+        )(params.bufname)
+        return ret
+      end,
+    }),
+    null_ls.builtins.diagnostics.eslint_d,
   },
 })
 
 -- Format
 vim.keymap.set("n", "<leader>l", function()
+  print("Formatting...")
   vim.lsp.buf.format({
     filter = function(client)
+      print(client.name)
       return client.name ~= "tsserver"
     end,
   })
@@ -585,7 +603,6 @@ require("nvim-treesitter.configs").setup({
     "vim",
     "prisma",
   },
-  context_commentstring = { enable = true },
   highlight = { enable = true },
   indent = { enable = true, disable = { "python" } },
   incremental_selection = {
@@ -717,7 +734,8 @@ local servers = {
           -- K8s
           ["https://json.schemastore.org/kustomization"] = "kustomization.yml",
           ["https://json.schemastore.org/kubeval"] = "kubeval.json",
-          ["https://raw.githubusercontent.com/instrumenta/kubernetes-json-schema/master/v1.18.0-standalone-strict/all.json"] = "/*.k8s.yml",
+          ["https://raw.githubusercontent.com/instrumenta/kubernetes-json-schema/master/v1.18.0-standalone-strict/all.json"] =
+          "/*.k8s.yml",
         },
       },
     },
